@@ -9,6 +9,9 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
@@ -29,6 +32,8 @@ import com.openttd.robot.model.GamePlayer;
  * Rule #3: Handle $end
  */
 public class TimerObjective implements DateEventListener, ChatEventListener {
+	
+	private static final Logger log = LoggerFactory.getLogger(TimerObjective.class);
 	
 	private final ExternalGameService externalGameService = ExternalServices.getInstance().getExternalGameService();
 	private final OpenttdAdmin openttdAdmin;
@@ -108,7 +113,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 		Collection<GamePlayer> gamePlayers = new ArrayList<GamePlayer>();
 		boolean winnerSet = false;
 		for(ScoreBean scoreBean : finalScores) {
-			System.out.println(scoreBean.companyId + "(" + scoreBean.score + "): " + scoreBean.externalUser);
+			log.info(scoreBean.companyId + "(" + scoreBean.score + "): " + scoreBean.externalUser);
 			if(scoreBean.externalUser != null) {
 				GamePlayer gamePlayer = new GamePlayer();
 				gamePlayer.setExternalUser(scoreBean.externalUser);

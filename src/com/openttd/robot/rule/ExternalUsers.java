@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
@@ -23,6 +26,8 @@ import com.openttd.robot.model.ExternalUser;
  * Rule #3: Handle !rename
  */
 public class ExternalUsers implements ChatEventListener {
+	
+	private static final Logger log = LoggerFactory.getLogger(ExternalUsers.class);
 	
 	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUserService externalUserService = ExternalServices.getInstance().getExternalUserService();
@@ -72,7 +77,7 @@ public class ExternalUsers implements ChatEventListener {
 						} else {
 							Set<Entry<Integer, ExternalUser>> copy = new HashSet<Entry<Integer, ExternalUser>>(externalUserByCompanyId.entrySet());
 							for(Entry<Integer, ExternalUser> entry : copy) {
-								System.out.println(entry.getKey() + " " + entry.getValue());
+								log.info(entry.getKey() + " " + entry.getValue());
 								if(user.equals(entry.getValue())) {
 									externalUserByCompanyId.remove(entry.getKey());
 								}
