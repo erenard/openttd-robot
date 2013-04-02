@@ -2,3 +2,6 @@
 /.project
 /openttd-robot.jar
 /bin
+/nb-build.xml
+/nbproject/
+
