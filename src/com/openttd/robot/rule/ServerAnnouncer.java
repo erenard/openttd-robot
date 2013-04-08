@@ -6,6 +6,8 @@ import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.event.ClientEvent;
 import com.openttd.admin.event.ClientEventListener;
 import com.openttd.network.admin.NetworkClient.Send;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Show announce on client join and every 6 months.
@@ -16,13 +18,12 @@ import com.openttd.network.admin.NetworkClient.Send;
  * Rule #4: $pause, $p
  * Rule #5: $unpause, $u
  */
-public class ServerAnnouncer implements ClientEventListener, ChatEventListener {
+public class ServerAnnouncer extends AbstractRule implements ClientEventListener, ChatEventListener {
 
-	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUsers externalUsers;
 
 	public ServerAnnouncer(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers) {
-		this.openttdAdmin = openttdAdmin;
+		super(openttdAdmin);
 		this.externalUsers = externalUsers;
 	}
 
@@ -66,24 +67,32 @@ public class ServerAnnouncer implements ClientEventListener, ChatEventListener {
 		}
 	}
 
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(2);
+		listEventTypes.add(ChatEvent.class);
+		listEventTypes.add(ClientEvent.class);
+		return listEventTypes;
+	}
+
 	private void pause() {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.rcon("pause");
 	}
 	
 	private void unpause() {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.rcon("unpause");
 	}
 	
 	private void showWelcome(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Welcome to www.strategyboard.net goal server.");
 		send.chatClient(clientId, "Type: !howto or !help.");
 	}
 
 	private void showRules(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Any violation of these rules will make you banned.");
 		send.chatClient(clientId, "# 0: Retaliation doesn't allow you to break any of these rules.");
 		send.chatClient(clientId, "# 1: Stay friendly and respect each other! Any racism/rude language will be sanctioned.");
@@ -100,13 +109,13 @@ public class ServerAnnouncer implements ClientEventListener, ChatEventListener {
 	}
 
 	private void showHelp(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Valid commands are !goal, !rules, !login, !howto, !score, !rename and !resetme.");
 		send.chatClient(clientId, "Short commands are !g, !r, !cv or !cp (equ. to !score)");
 	}
 	
 	private void showHelpAdmin(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Valid commands are $clients, $companies, $warn, $kick, $ban, $reset, $pause, $unpause");
 		send.chatClient(clientId, "Short commands are $cls, $cps, $w, $k, $b, $r, $p, $u");
 	}

@@ -18,6 +18,8 @@ import com.openttd.network.admin.NetworkClient.Send;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalUserService;
 import com.openttd.robot.model.ExternalUser;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Store the users info
@@ -25,15 +27,14 @@ import com.openttd.robot.model.ExternalUser;
  * Rule #2: Handle !howto
  * Rule #3: Handle !rename
  */
-public class ExternalUsers implements ChatEventListener {
+public class ExternalUsers extends AbstractRule implements ChatEventListener {
 	
 	private static final Logger log = LoggerFactory.getLogger(ExternalUsers.class);
 	
-	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUserService externalUserService = ExternalServices.getInstance().getExternalUserService();
 
 	public ExternalUsers(OpenttdAdmin openttdAdmin) {
-		this.openttdAdmin = openttdAdmin;
+		super(openttdAdmin);
 	}
 
 	private Map<Integer, ExternalUser> externalUserByClientId = new HashMap<Integer, ExternalUser>();
@@ -100,24 +101,31 @@ public class ExternalUsers implements ChatEventListener {
 			}
 		}
 	}
+
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(1);
+		listEventTypes.add(ChatEvent.class);
+		return listEventTypes;
+	}
 	
 	private void showCompanyOwned(Integer clientId, String companyName, ExternalUser user) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Congratulation ! You now own " + companyName + ".");
 	}
 
 	private void showCompanyAlreadyOwned(Integer clientId, String companyName) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "You already own " + companyName + ".");
 	}
 
 	private void showCompanyAlreadyOwned(Integer clientId, String companyName, ExternalUser user) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, companyName + "is already owned by " + user.getName());
 	}
 
 	private void renameClient(Integer clientId, String name) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		if(name.length() > 1) {
 			if(name.startsWith("Player")) {
 				send.chatClient(clientId, "Player... names are not allowed, try again...");
@@ -149,17 +157,17 @@ public class ExternalUsers implements ChatEventListener {
 	}
 
 	private void showLoginFailed(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Login failed.");
 	}
 	
 	private void showLoginSucceed(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Login succeed.");
 	}
 	
 	public void showHowtoLogin(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "How to login ***");
 		send.chatClient(clientId, "1. Goto www.strategyboard.net and register there,");
 		send.chatClient(clientId, "2. Login there and click 'In game login',");
@@ -167,7 +175,7 @@ public class ExternalUsers implements ChatEventListener {
 	}
 		
 	private void showClientAlreadyLogged(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "You are already logged.");
 	}
 	

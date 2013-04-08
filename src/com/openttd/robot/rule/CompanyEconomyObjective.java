@@ -33,7 +33,7 @@ import com.openttd.robot.model.GamePlayer;
  * Rule #1: Handle !goal, !g
  * Rule #2: Handle !score, !cv, !cp
  */
-public class CompanyEconomyObjective implements CompanyEventListener, DateEventListener, ChatEventListener {
+public class CompanyEconomyObjective extends AbstractRule implements CompanyEventListener, DateEventListener, ChatEventListener {
 	
 	//TODO Add cargo delivered
 	public enum ObjectiveType {
@@ -42,7 +42,6 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 	
 	private final ExternalUsers externalUsers;
 	private final ExternalGameService externalGameService = ExternalServices.getInstance().getExternalGameService();
-	private final OpenttdAdmin openttdAdmin;
 	private final ObjectiveType objectiveType;
 	private final double objectiveValue;
 	private boolean objectiveReached;
@@ -57,7 +56,7 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 	private Map<Integer, Double> progressHistoryByCompanyId = new HashMap<Integer, Double>();
 	
 	public CompanyEconomyObjective(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers, ObjectiveType objectiveType, double objectiveValue) {
-		this.openttdAdmin = openttdAdmin;
+		super(openttdAdmin);
 		this.objectiveType = objectiveType;
 		this.objectiveValue = objectiveValue;
 		this.externalUsers = externalUsers;
@@ -83,6 +82,15 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		listEventTypes.add(CompanyEvent.class);
+		listEventTypes.add(DateEvent.class);
+		listEventTypes.add(ChatEvent.class);
+		return listEventTypes;
 	}
 
 	@Override
@@ -171,7 +179,7 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 			} else if(message.equals("$score")) {
 				
 				Collection<GamePlayer> gamePlayers = calculateScores(chatEvent.getOpenttd());
-				Send send = openttdAdmin.getSend();
+				Send send = super.getSend();
 				for(GamePlayer gamePlayer : gamePlayers) {
 					send.chatClient(clientId, gamePlayer.toString());
 				}
@@ -180,7 +188,7 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 	}
 	
 	private void showGoal(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Goal ***");
 		if(this.objectiveType.equals(ObjectiveType.PERFORMANCE)) {
 			send.chatClient(clientId, "The first company to reach a performance of " + objectiveValue + " win the game.");
@@ -190,14 +198,14 @@ public class CompanyEconomyObjective implements CompanyEventListener, DateEventL
 	}
 	
 	private void broadcastVictory(Game openttd) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatBroadcast("Game Over : " + winnerName + " win !!!");
 		showScore(-1, openttd);
 		send.chatBroadcast("Server will restart.");
 	}
 	
 	private void showScore(long clientId, Game openttd) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Score ***");
 		List<Entry<Integer, Double>> entries = getSortedProgressionByCompanyId();
 		int idx = 0;

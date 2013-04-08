@@ -9,6 +9,8 @@ import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkClient.Send;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Take care of the admins commands
@@ -17,13 +19,12 @@ import com.openttd.network.admin.NetworkClient.Send;
  * Rule #3: Handle $ban, $b //TODO Test
  * Rule #4: Handle $warn, $w
  */
-public class Administration implements ChatEventListener {
+public class Administration extends AbstractRule implements ChatEventListener {
 	
-	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUsers externalUsers;
 	
 	public Administration(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers) {
-		this.openttdAdmin = openttdAdmin;
+		super(openttdAdmin);
 		this.externalUsers = externalUsers;
 	}
 	
@@ -73,11 +74,17 @@ public class Administration implements ChatEventListener {
 			}
 		}
 	}
-	
+
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(1);
+		listEventTypes.add(ChatEvent.class);
+		return listEventTypes;
+	}
 
 
 	private void showClients(Game openttd, int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "#ClientId, Name, IpAddress, CompanyId");
 		for(Client client : openttd.getClients()) {
 			send.chatClient(clientId, "#" + client.getId() + ", " + client.getName() + ", " + client.getIp() + ", " + client.getCompanyId());
@@ -85,24 +92,24 @@ public class Administration implements ChatEventListener {
 	}
 
 	private void showMessage(int clientId, String message) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, message);
 	}
 	
 	private void kick(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.rcon("kick " + clientId);
 	}
 
 	private void ban(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.rcon("ban " + clientId);
 	}
 
 	private Map<Integer, Integer> warningCountByClientId = new HashMap<Integer, Integer>();
 	
 	private void warn(int clientId, String warning) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		Integer warningCount = warningCountByClientId.get(clientId);
 		if(warningCount == null) {
 			warningCount = 0;
@@ -118,5 +125,4 @@ public class Administration implements ChatEventListener {
 		}
 		warningCountByClientId.put(clientId, warningCount + 1);
 	}
-
 }

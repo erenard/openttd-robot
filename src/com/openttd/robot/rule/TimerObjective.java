@@ -31,12 +31,11 @@ import com.openttd.robot.model.GamePlayer;
  * Rule #2: Handle !score, !cv, !cp
  * Rule #3: Handle $end
  */
-public class TimerObjective implements DateEventListener, ChatEventListener {
+public class TimerObjective extends AbstractRule implements DateEventListener, ChatEventListener {
 	
 	private static final Logger log = LoggerFactory.getLogger(TimerObjective.class);
 	
 	private final ExternalGameService externalGameService = ExternalServices.getInstance().getExternalGameService();
-	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUsers externalUsers;
 	private final int nbYear;
 	/* Game State */
@@ -49,7 +48,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 	private int currentTrimester;
 	
 	public TimerObjective(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers, int nbYear) {
-		this.openttdAdmin = openttdAdmin;
+		super(openttdAdmin);
 		this.externalUsers = externalUsers;
 		this.nbYear = nbYear;
 		this.gameEnded = false;
@@ -73,6 +72,14 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(2);
+		listEventTypes.add(ChatEvent.class);
+		listEventTypes.add(DateEvent.class);
+		return listEventTypes;
 	}
 
 	@Override
@@ -147,7 +154,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 				//Rule #3
 				ExternalUser user = externalUsers.getExternalUser(clientId);
 				if(user != null && user.isAdmin()) {
-					Send send = openttdAdmin.getSend();
+					Send send = super.getSend();
 					send.chatClient(clientId, "Game ending now !");
 					endGame = chatEvent.getOpenttd().getDate();
 				}
@@ -156,7 +163,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 	}
 	
 	private void showGoal(int clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Goal ***");
 		if(endGame != null) {
 			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
@@ -168,7 +175,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 	}
 	
 	private void broadcastVictory(Game openttd) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatBroadcast("Game Over ***");
 		boolean winner = true;
 		if(finalScores != null) {
@@ -197,7 +204,7 @@ public class TimerObjective implements DateEventListener, ChatEventListener {
 	}
 	
 	private void showScore(long clientId, Game openttd) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, "Score ***");
 		Collection<ScoreBean> scoreBeans = calculateScores(openttd);
 		for(ScoreBean scoreBean : scoreBeans) {

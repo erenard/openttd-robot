@@ -17,12 +17,14 @@ import com.openttd.admin.event.ClientEventListener;
 import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.admin.event.CompanyEvent.Action;
+import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkClient.Send;
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.util.Convert;
+import java.util.ArrayList;
 
 /**
  * Company life-cycle rule :
@@ -33,13 +35,13 @@ import com.openttd.util.Convert;
  * Rule #5: handle !info
  * Rule #6: handle $reset
  */
-public class CompanyLifeCycle implements CompanyEventListener, ChatEventListener, ClientEventListener {
+public class CompanyLifeCycle extends AbstractRule implements CompanyEventListener, ChatEventListener, ClientEventListener {
 	
-	private final OpenttdAdmin openttdAdmin;
 	private final ExternalUsers externalUsers;
-	public CompanyLifeCycle(OpenttdAdmin client, ExternalUsers externalUsers) {
+
+	public CompanyLifeCycle(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers) {
+		super(openttdAdmin);
 		this.externalUsers = externalUsers;
-		this.openttdAdmin = client;
 	}
 
 	//Company id stored by the ip address of the creator  
@@ -82,12 +84,21 @@ public class CompanyLifeCycle implements CompanyEventListener, ChatEventListener
 		}		
 	}
 
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		listEventTypes.add(CompanyEvent.class);
+		listEventTypes.add(ClientEvent.class);
+		listEventTypes.add(ChatEvent.class);
+		return listEventTypes;
+	}
+
 	private void testCompany(int companyId, Game game) {
 		/*
 		 * This case will always be called AFTER UPDATE,
 		 * It's due to openttd.
 		 */
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		//Case : Company creation
 		// Find the company owner
 		ExternalUser companyOwner = null;
@@ -175,7 +186,7 @@ public class CompanyLifeCycle implements CompanyEventListener, ChatEventListener
 	}
 
 	private void deleteCompany(Game game, int companyId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		Collection<Client> clients = game.getClients(companyId);
 		for(Client client : clients) {
 			send.rcon("move " + client.getId() + " 255");
@@ -220,12 +231,12 @@ public class CompanyLifeCycle implements CompanyEventListener, ChatEventListener
 	}
 
 	private void showMessage(int clientId, String message) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		send.chatClient(clientId, message);
 	}
 	
 	private void showCompanies(Game openttd, Integer clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
 		send.chatClient(clientId, "#Id, Name, CEO, Inauguration.");
 		for(Company company : openttd.getCompanies()) {
@@ -243,7 +254,7 @@ public class CompanyLifeCycle implements CompanyEventListener, ChatEventListener
 	}
 	
 	private void showInfo(Game openttd, Integer clientId) {
-		Send send = openttdAdmin.getSend();
+		Send send = super.getSend();
 		Client client = openttd.getClient(clientId);
 		if(client != null) {
 			String userName = "Anonymous";

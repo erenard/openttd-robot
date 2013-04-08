@@ -1,7 +1,5 @@
 package com.openttd.robot.rule;
 
-import java.util.Calendar;
-
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
@@ -9,14 +7,17 @@ import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkClient.Send;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Calendar;
+
 /**
  * Warn non-passworded companies, once a month.
  */
-public class CompanyPasswordRemainder implements DateEventListener {
+public class CompanyPasswordRemainder extends AbstractRule implements DateEventListener {
 	
-	private final OpenttdAdmin client;
-	public CompanyPasswordRemainder(OpenttdAdmin client, ExternalUsers externalUsers) {
-		this.client = client;
+	public CompanyPasswordRemainder(OpenttdAdmin openttdAdmin) {
+		super(openttdAdmin);
 	}
 
 	private int currentMonth;
@@ -44,8 +45,15 @@ public class CompanyPasswordRemainder implements DateEventListener {
 		}
 	}
 
+	@Override
+	public Collection<Class> listEventTypes() {
+		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		listEventTypes.add(DateEvent.class);
+		return listEventTypes;
+	}
+
 	private void warningNoPassword(int companyId) {
-		Send send = client.getSend();
+		Send send = super.getSend();
 		send.chatCompany((short) companyId, "Warning: your company has NO PASSWORD.");
 	}
 }
