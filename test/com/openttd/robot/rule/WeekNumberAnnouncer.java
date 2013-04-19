@@ -10,11 +10,11 @@ import java.util.Calendar;
 import java.util.Collection;
 
 /**
- * Test the gamescript
+ * Show the week number in a newspaper every week
  */
-public class GameScriptTest extends AbstractRule implements GameScriptEventListener, DateEventListener {
+public class WeekNumberAnnouncer extends AbstractRule implements GameScriptEventListener, DateEventListener {
 	
-	public GameScriptTest(OpenttdAdmin openttdAdmin) {
+	public WeekNumberAnnouncer(OpenttdAdmin openttdAdmin) {
 		super(openttdAdmin);
 	}
 	
@@ -35,7 +35,7 @@ public class GameScriptTest extends AbstractRule implements GameScriptEventListe
 	public void onDateEvent(DateEvent dateEvent) {
 		Calendar now = dateEvent.getOpenttd().getDate();
 		if(isNewWeek(now)) {
-			super.getSend().gameScript("{\"script\": \"GSAdmin.Send({a:0});\"}");
+			super.getSend().newsBroadcast("This is week number " + now.get(Calendar.WEEK_OF_YEAR));
 		}
 	}
 

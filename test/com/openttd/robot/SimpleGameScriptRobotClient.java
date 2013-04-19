@@ -2,16 +2,16 @@ package com.openttd.robot;
 
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.network.core.Configuration;
-import com.openttd.robot.rule.GameScriptTest;
+import com.openttd.robot.rule.WeekNumberAnnouncer;
 
 public class SimpleGameScriptRobotClient {
 	
 	private final OpenttdAdmin openttdAdmin;
-	private final GameScriptTest gameScriptTest;
+	private final WeekNumberAnnouncer gameScriptTest;
 
 	public SimpleGameScriptRobotClient(Configuration configuration) {
 		openttdAdmin = new OpenttdAdmin(configuration);
-		gameScriptTest = new GameScriptTest(openttdAdmin);
+		gameScriptTest = new WeekNumberAnnouncer(openttdAdmin);
 	}
 	
 	public void startup() {
