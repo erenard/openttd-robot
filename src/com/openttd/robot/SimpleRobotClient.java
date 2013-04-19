@@ -1,7 +1,6 @@
 package com.openttd.robot;
 
 import com.openttd.admin.OpenttdAdmin;
-import com.openttd.network.admin.NetworkClient;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.ExternalServices.ExternalUserService;
 import com.openttd.robot.model.ExternalUser;
@@ -36,6 +35,21 @@ public class SimpleRobotClient {
 	}
 
 	public static void main(String[] args) {
+		Configuration configuration = new Configuration();
+		
+		try {
+			String url = args[0];
+			configuration.host = url.split(":")[0];
+			configuration.adminPort = new Integer(url.split(":")[1]);
+			configuration.password = args[1];
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Usage: java -jar openttd-robot.jar localhost:3977 admin_password");
+			System.err.println("See openttd.cfg to set your server's admin_password first !");
+			System.exit(0);
+		}
+
+		//Fake user identification
 		ExternalServices.getInstance().setExternalUserService(new ExternalUserService() {
 			@Override
 			public ExternalUser identifyUser(String token) {
@@ -44,7 +58,8 @@ public class SimpleRobotClient {
 				return externalUser;
 			}}
 		);
-		SimpleRobotClient robot = new SimpleRobotClient(new Configuration());
+		
+		SimpleRobotClient robot = new SimpleRobotClient(configuration);
 		robot.startup();
 		try {
 			Thread.sleep(90000);

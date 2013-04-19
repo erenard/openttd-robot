@@ -17,7 +17,6 @@ import com.openttd.admin.event.ClientEventListener;
 import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.admin.event.CompanyEvent.Action;
-import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
