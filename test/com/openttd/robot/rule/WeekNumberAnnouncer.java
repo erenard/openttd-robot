@@ -5,6 +5,8 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
+import com.openttd.constant.OTTD;
+import com.openttd.network.constant.GameScript;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,7 +37,7 @@ public class WeekNumberAnnouncer extends AbstractRule implements GameScriptEvent
 	public void onDateEvent(DateEvent dateEvent) {
 		Calendar now = dateEvent.getOpenttd().getDate();
 		if(isNewWeek(now)) {
-			super.getSend().newsBroadcast("This is week number " + now.get(Calendar.WEEK_OF_YEAR));
+			super.getSend().newsBroadcast(OTTD.NewsType.NT_GENERAL, "This is week number " + now.get(Calendar.WEEK_OF_YEAR));
 		}
 	}
 
