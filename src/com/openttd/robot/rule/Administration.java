@@ -18,6 +18,9 @@ import java.util.Collection;
  * Rule #2: Handle $kick, $k
  * Rule #3: Handle $ban, $b //TODO Test
  * Rule #4: Handle $warn, $w
+ * Rule #5: $help, $h
+ * Rule #6: $pause, $p
+ * Rule #7: $unpause, $u
  */
 public class Administration extends AbstractRule implements ChatEventListener {
 	
@@ -27,17 +30,16 @@ public class Administration extends AbstractRule implements ChatEventListener {
 		super(openttdAdmin);
 		this.externalUsers = externalUsers;
 	}
-	
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
-		Integer clientId = chatEvent.getClientId();
+		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
-		if(clientId != null && message != null) {
-			message = message.trim();
+		if(message != null) {
+			message = message.trim().toLowerCase();
 			if(externalUsers.getExternalUser(clientId) != null
 			&& externalUsers.getExternalUser(clientId).isAdmin()) {
-				if(message.startsWith("$clients") || message.startsWith("$cls")) {
+				if(message.equals("$clients") || message.equals("$cls")) {
 					//Rule #1
 					showClients(chatEvent.getOpenttd(), clientId);
 				} else if(message.startsWith("$kick") || message.startsWith("$k")) {
@@ -55,21 +57,30 @@ public class Administration extends AbstractRule implements ChatEventListener {
 						String argument = message.split(" ")[1].trim();
 						Integer bannedClientId = new Integer(argument);
 						ban(bannedClientId);
-					} catch(Exception e) {
-						showMessage(clientId, "Usage: $kick clientId (try $clients to find clientIds)");
+					} catch(Exception ignore) {
+						showMessage(clientId, "Usage: $ban clientId (try $clients to find clientIds)");
 					}
 				} else if(message.startsWith("$warn") || message.startsWith("$w")) {
 					//Rule #4
 					try {
+						message = chatEvent.getMessage().trim();
 						String [] args = message.split(" ");
-						String argument = args[1].trim();
-						int _clientId = Integer.parseInt(argument);
-						String _message = "";
-						if(args.length > 1) _message = message.substring(message.indexOf(args[2].trim()));
-						warn(_clientId, _message);
-					} catch(Exception e) {
+						int warnedClientId = Integer.parseInt(args[1]);
+						String warningMessage = "";
+						if(args.length > 1) warningMessage = message.substring(message.indexOf(args[2]));
+						warn(warnedClientId, warningMessage);
+					} catch(Exception ignore) {
 						showMessage(clientId, "Usage: $warn clientId [message] (try $clients to find clientIds)");
 					}
+				} else if(message.startsWith("$help") || message.equals("$h")) {
+					//Rule #5
+					showHelpAdmin(clientId);
+				} else if(message.startsWith("$pause") || message.equals("$p")) {
+					//Rule #6
+					pause();
+				} else if(message.startsWith("$unpause") || message.equals("$u")) {
+					//Rule #7
+					unpause();
 				}
 			}
 		}
@@ -125,4 +136,21 @@ public class Administration extends AbstractRule implements ChatEventListener {
 		}
 		warningCountByClientId.put(clientId, warningCount + 1);
 	}
+
+	private void showHelpAdmin(int clientId) {
+		Send send = super.getSend();
+		send.chatClient(clientId, "Valid commands are $clients, $companies, $warn, $kick, $ban, $reset, $pause, $unpause");
+		send.chatClient(clientId, "Short commands are $cls, $cps, $w, $k, $b, $r, $p, $u");
+	}
+	
+	private void pause() {
+		Send send = super.getSend();
+		send.rcon("pause");
+	}
+	
+	private void unpause() {
+		Send send = super.getSend();
+		send.rcon("unpause");
+	}
+	
 }

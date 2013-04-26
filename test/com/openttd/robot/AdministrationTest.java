@@ -1,0 +1,78 @@
+package com.openttd.robot;
+
+import com.openttd.admin.OpenttdAdmin;
+import com.openttd.admin.event.DateEvent;
+import com.openttd.admin.event.DateEventListener;
+import com.openttd.network.core.Configuration;
+import com.openttd.robot.rule.AbstractRule;
+import com.openttd.robot.rule.Administration;
+import com.openttd.robot.rule.ExternalUsers;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+
+public class AdministrationTest extends OpenttdAdmin {
+	
+	/**
+	 * Ingame help rule.
+	 * Show the help message every monday.
+	 * See HelloWorldTest for more info on rules
+	 */
+	private static class IngameInfo extends AbstractRule implements DateEventListener {
+
+		public IngameInfo(OpenttdAdmin openttdAdmin) {
+			super(openttdAdmin);
+		}
+
+		@Override
+		protected Collection<Class> listEventTypes() {
+			Collection<Class> classes = new ArrayList<Class>();
+			classes.add(DateEvent.class);
+			return classes;
+		}
+
+		@Override
+		public void onDateEvent(DateEvent dateEvent) {
+			Calendar date = dateEvent.getOpenttd().getDate();
+			if(date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+				this.getSend().chatBroadcast("Welcome to this login demo.");
+				this.getSend().chatBroadcast("Type '!login username' to log on (any name will work).");
+				this.getSend().chatBroadcast("If your username starts with 'admin', you will have moderation powers.");
+				this.getSend().chatBroadcast("Once logged, type '$help' to know more about moderation commands.");
+			}
+		}
+	}
+
+	//External user login rule
+	private final ExternalUsers externalUsers;
+	//Administration commands rule
+	private final Administration administration;
+	//Ingame info rule
+	private final IngameInfo ingameInfo;
+
+	public AdministrationTest(Configuration configuration) {
+		super(configuration);
+		externalUsers = new ExternalUsers(this);
+		administration = new Administration(this, externalUsers);
+		ingameInfo = new IngameInfo(this);
+	}
+
+	public static void main(String[] args) {
+		Configuration configuration = new Configuration();
+		CLITestUtil.parseArguments(args, configuration);
+		CLITestUtil.fakeExternalUserService();
+		//Create the robot
+		HelloWorldTest robot = new HelloWorldTest(configuration);
+		//Start the robot and connect it to OpenTTD
+		robot.startup();
+		//Wait 3 minutes
+		try {
+			Thread.sleep(180000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		//Disconnect the robot and shut it down
+		robot.shutdown();
+	}
+
+}

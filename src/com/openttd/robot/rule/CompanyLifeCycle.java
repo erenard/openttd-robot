@@ -195,11 +195,11 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
-		Integer clientId = chatEvent.getClientId();
+		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
 		Game openttd = chatEvent.getOpenttd();
-		if(clientId != null && message != null) {
-			message = message.trim();
+		if(message != null) {
+			message = message.trim().toLowerCase();
 			if(message.equals("!resetme")) {
 				//Rule #3
 				Client client = openttd.getClient(clientId);
@@ -221,7 +221,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 						String argument = message.split(" ")[1].trim();
 						Integer companyId = new Integer(argument);
 						deleteCompany(openttd, companyId);
-					} catch(Exception e) {
+					} catch(Exception ignore) {
 						showMessage(clientId, "Usage: $reset companyId (try $companies to find companyIds)");
 					}
 				}

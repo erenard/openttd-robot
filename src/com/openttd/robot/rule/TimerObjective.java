@@ -19,6 +19,7 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
+import com.openttd.constant.OTTD;
 import com.openttd.network.admin.NetworkClient.Send;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalGameService;
@@ -140,11 +141,11 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
-		Integer clientId = chatEvent.getClientId();
+		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
-		if(clientId != null && message != null) {
-			message = message.trim();
-			if(message.startsWith("!goal") || message.equals("!g")) {
+		if(message != null) {
+			message = message.trim().toLowerCase();
+			if(message.equals("!goal") || message.equals("!g")) {
 				//Rule #1
 				showGoal(clientId);
 			} else if(message.equals("!score") || message.equals("!cv") || message.equals("!cp")) {
@@ -177,16 +178,21 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 	private void broadcastVictory(Game openttd) {
 		Send send = super.getSend();
 		send.chatBroadcast("Game Over ***");
-		boolean winner = true;
 		if(finalScores != null) {
+			boolean winner = true;
 			for(ScoreBean scoreBean : finalScores) {
 				StringBuilder stringBuilder = new StringBuilder();
 				Formatter formatter = new Formatter(stringBuilder);
 				if(scoreBean.externalUser != null) {
-					formatter.format("%s%s get %d points on the leaderboard.",
-							scoreBean.externalUser.getName(),
-							winner ? " wins the game and" : "", scoreBean.score);
-					winner = false;
+					if(winner) {
+						formatter.format("%s wins the game and get %d points on the leaderboard.",
+							scoreBean.externalUser.getName(), scoreBean.score);
+						send.newsBroadcast(OTTD.NewsType.NT_GENERAL, stringBuilder.toString());
+						winner = false;
+					} else {
+						formatter.format("%s get %d points on the leaderboard.",
+							scoreBean.externalUser.getName(), scoreBean.score);
+					}
 				} else {
 					Company company = openttd.getCompany(scoreBean.companyId);
 					formatter.format("%s: %d points wasted, player not logged.",

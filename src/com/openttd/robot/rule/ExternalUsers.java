@@ -42,11 +42,12 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
-		Integer clientId = chatEvent.getClientId();
+		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
-		if(clientId != null && message != null) {
+		if(message != null) {
 			message = message.trim();
-			if(message.startsWith("!login ")) {
+			String command = message.toLowerCase();
+			if(command.startsWith("!login ")) {
 				//Rule #1
 				String loginToken = message.substring("!login ".length());
 				ExternalUser user = externalUserService.identifyUser(loginToken);
@@ -91,10 +92,10 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 					showLoginFailed(clientId);
 					showHowtoLogin(clientId);
 				}
-			} else if(message.equals("!howto")) {
+			} else if(command.equals("!howto")) {
 				//Rule #2
 				showHowtoLogin(clientId);
-			} else if(message.startsWith("!rename ")) {
+			} else if(command.startsWith("!rename ")) {
 				//Rule #3
 				String newName = message.substring("!rename ".length()).trim();
 				renameClient(clientId, newName);

@@ -166,18 +166,17 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
-		Integer clientId = chatEvent.getClientId();
+		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
-		if(clientId != null && message != null) {
-			message = message.trim();
-			if(message.startsWith("!goal") || message.equals("!g")) {
+		if(message != null) {
+			message = message.trim().toLowerCase();
+			if(message.equals("!goal") || message.equals("!g")) {
 				//Rule #1
 				showGoal(clientId);
 			} else if(message.equals("!score") || message.equals("!cv") || message.equals("!cp")) {
 				//Rule #2
 				showScore(clientId, chatEvent.getOpenttd());
 			} else if(message.equals("$score")) {
-				
 				Collection<GamePlayer> gamePlayers = calculateScores(chatEvent.getOpenttd());
 				Send send = super.getSend();
 				for(GamePlayer gamePlayer : gamePlayers) {
