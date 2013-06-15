@@ -20,6 +20,7 @@ import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.constant.OTTD;
+import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.admin.NetworkClient.Send;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalGameService;
@@ -187,7 +188,8 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 					if(winner) {
 						formatter.format("%s wins the game and get %d points on the leaderboard.",
 							scoreBean.externalUser.getName(), scoreBean.score);
-						send.newsBroadcast(OTTD.NewsType.NT_GENERAL, stringBuilder.toString());
+						GSNewsPaper newsPaper = new GSNewsPaper(GSNewsPaper.NewsType.NT_GENERAL, stringBuilder.toString());
+						send.gameScript(newsPaper.toString());
 						winner = false;
 					} else {
 						formatter.format("%s get %d points on the leaderboard.",

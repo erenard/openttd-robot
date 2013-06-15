@@ -4,6 +4,7 @@ import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.constant.OTTD;
+import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
 import java.util.ArrayList;
@@ -79,7 +80,8 @@ public class HelloWorldGameScriptTest {
 		public void onDateEvent(DateEvent dateEvent) {
 			Calendar date = dateEvent.getOpenttd().getDate();
 			if(date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-				super.getSend().newsBroadcast(OTTD.NewsType.NT_GENERAL, "Admin\nHello world !!!");
+				GSNewsPaper newsPaper = new GSNewsPaper(GSNewsPaper.NewsType.NT_GENERAL, "Admin\nHello world !!!");
+				super.getSend().gameScript(newsPaper.toString());
 			}
 		}
 	}
