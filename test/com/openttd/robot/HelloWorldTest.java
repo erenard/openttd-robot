@@ -1,13 +1,14 @@
 package com.openttd.robot;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
 
 public class HelloWorldTest {
 	//Openttd admin port library

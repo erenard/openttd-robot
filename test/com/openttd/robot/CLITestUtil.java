@@ -1,11 +1,12 @@
 package com.openttd.robot;
 
+import java.util.Collection;
+
 import com.openttd.network.core.Configuration;
-import com.openttd.robot.ExternalServices.ExternalUserService;
 import com.openttd.robot.ExternalServices.ExternalGameService;
+import com.openttd.robot.ExternalServices.ExternalUserService;
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.robot.model.GamePlayer;
-import java.util.Collection;
 
 /**
  * Dummy class, makes samples easiers to read.

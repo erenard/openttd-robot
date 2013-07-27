@@ -22,7 +22,7 @@ import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
-import com.openttd.network.admin.NetworkClient.Send;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalGameService;
 import com.openttd.robot.model.ExternalUser;
@@ -178,7 +178,7 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 				showScore(clientId, chatEvent.getOpenttd());
 			} else if(message.equals("$score")) {
 				Collection<GamePlayer> gamePlayers = calculateScores(chatEvent.getOpenttd());
-				Send send = super.getSend();
+				NetworkAdminSender send = super.getSend();
 				for(GamePlayer gamePlayer : gamePlayers) {
 					send.chatClient(clientId, gamePlayer.toString());
 				}
@@ -187,7 +187,7 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 	}
 	
 	private void showGoal(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Goal ***");
 		if(this.objectiveType.equals(ObjectiveType.PERFORMANCE)) {
 			send.chatClient(clientId, "The first company to reach a performance of " + objectiveValue + " win the game.");
@@ -197,14 +197,14 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 	}
 	
 	private void broadcastVictory(Game openttd) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatBroadcast("Game Over : " + winnerName + " win !!!");
 		showScore(-1, openttd);
 		send.chatBroadcast("Server will restart.");
 	}
 	
 	private void showScore(long clientId, Game openttd) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Score ***");
 		List<Entry<Integer, Double>> entries = getSortedProgressionByCompanyId();
 		int idx = 0;

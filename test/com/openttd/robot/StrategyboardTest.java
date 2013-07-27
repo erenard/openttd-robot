@@ -4,6 +4,9 @@
  */
 package com.openttd.robot;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
@@ -15,8 +18,6 @@ import com.openttd.robot.rule.CompanyPasswordRemainder;
 import com.openttd.robot.rule.ExternalUsers;
 import com.openttd.robot.rule.ServerAnnouncer;
 import com.openttd.robot.rule.TimerObjective;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class StrategyboardTest {
 	private final OpenttdAdmin robot;

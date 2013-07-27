@@ -1,6 +1,7 @@
 package com.openttd.robot.rule;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Formatter;
@@ -15,15 +16,14 @@ import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.event.ClientEvent;
 import com.openttd.admin.event.ClientEventListener;
 import com.openttd.admin.event.CompanyEvent;
-import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.admin.event.CompanyEvent.Action;
+import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
-import com.openttd.network.admin.NetworkClient.Send;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.util.Convert;
-import java.util.ArrayList;
 
 /**
  * Company life-cycle rule :
@@ -97,7 +97,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		 * This case will always be called AFTER UPDATE,
 		 * It's due to openttd.
 		 */
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		//Case : Company creation
 		// Find the company owner
 		ExternalUser companyOwner = null;
@@ -185,7 +185,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 	}
 
 	private void deleteCompany(Game game, int companyId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		Collection<Client> clients = game.getClients(companyId);
 		for(Client client : clients) {
 			send.rcon("move " + client.getId() + " 255");
@@ -230,12 +230,12 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 	}
 
 	private void showMessage(int clientId, String message) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, message);
 	}
 	
 	private void showCompanies(Game openttd, Integer clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
 		send.chatClient(clientId, "#Id, Name, CEO, Inauguration.");
 		for(Company company : openttd.getCompanies()) {
@@ -253,7 +253,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 	}
 	
 	private void showInfo(Game openttd, Integer clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		Client client = openttd.getClient(clientId);
 		if(client != null) {
 			String userName = "Anonymous";

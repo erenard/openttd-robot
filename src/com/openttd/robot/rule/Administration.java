@@ -1,5 +1,7 @@
 package com.openttd.robot.rule;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,9 +10,7 @@ import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.model.Client;
 import com.openttd.admin.model.Game;
-import com.openttd.network.admin.NetworkClient.Send;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.openttd.network.admin.NetworkAdminSender;
 
 /**
  * Take care of the admins commands
@@ -95,7 +95,7 @@ public class Administration extends AbstractRule implements ChatEventListener {
 
 
 	private void showClients(Game openttd, int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "#ClientId, Name, IpAddress, CompanyId");
 		for(Client client : openttd.getClients()) {
 			send.chatClient(clientId, "#" + client.getId() + ", " + client.getName() + ", " + client.getIp() + ", " + client.getCompanyId());
@@ -103,24 +103,24 @@ public class Administration extends AbstractRule implements ChatEventListener {
 	}
 
 	private void showMessage(int clientId, String message) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, message);
 	}
 	
 	private void kick(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.rcon("kick " + clientId);
 	}
 
 	private void ban(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.rcon("ban " + clientId);
 	}
 
 	private Map<Integer, Integer> warningCountByClientId = new HashMap<Integer, Integer>();
 	
 	private void warn(int clientId, String warning) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		Integer warningCount = warningCountByClientId.get(clientId);
 		if(warningCount == null) {
 			warningCount = 0;
@@ -138,18 +138,18 @@ public class Administration extends AbstractRule implements ChatEventListener {
 	}
 
 	private void showHelpAdmin(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Valid commands are $clients, $companies, $warn, $kick, $ban, $reset, $pause, $unpause");
 		send.chatClient(clientId, "Short commands are $cls, $cps, $w, $k, $b, $r, $p, $u");
 	}
 	
 	private void pause() {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.rcon("pause");
 	}
 	
 	private void unpause() {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.rcon("unpause");
 	}
 	

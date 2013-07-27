@@ -1,15 +1,15 @@
 package com.openttd.robot;
 
-import com.openttd.admin.OpenttdAdmin;
-import com.openttd.admin.event.DateEvent;
-import com.openttd.admin.event.DateEventListener;
-import com.openttd.constant.OTTD;
-import com.openttd.gamescript.GSNewsPaper;
-import com.openttd.network.core.Configuration;
-import com.openttd.robot.rule.AbstractRule;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+
+import com.openttd.admin.OpenttdAdmin;
+import com.openttd.admin.event.DateEvent;
+import com.openttd.admin.event.DateEventListener;
+import com.openttd.gamescript.GSNewsPaper;
+import com.openttd.network.core.Configuration;
+import com.openttd.robot.rule.AbstractRule;
 
 public class HelloWorldGameScriptTest {
 	//Openttd admin port library

@@ -1,5 +1,7 @@
 package com.openttd.robot.rule;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,12 +16,10 @@ import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
-import com.openttd.network.admin.NetworkClient.Send;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalUserService;
 import com.openttd.robot.model.ExternalUser;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Store the users info
@@ -111,22 +111,22 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 	}
 	
 	private void showCompanyOwned(Integer clientId, String companyName, ExternalUser user) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Congratulation ! You now own " + companyName + ".");
 	}
 
 	private void showCompanyAlreadyOwned(Integer clientId, String companyName) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "You already own " + companyName + ".");
 	}
 
 	private void showCompanyAlreadyOwned(Integer clientId, String companyName, ExternalUser user) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, companyName + "is already owned by " + user.getName());
 	}
 
 	private void renameClient(Integer clientId, String name) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		if(name.length() > 1) {
 			if(name.startsWith("Player")) {
 				send.chatClient(clientId, "Player... names are not allowed, try again...");
@@ -158,17 +158,17 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 	}
 
 	private void showLoginFailed(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Login failed.");
 	}
 	
 	private void showLoginSucceed(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Login succeed.");
 	}
 	
 	public void showHowtoLogin(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "How to login ***");
 		send.chatClient(clientId, "1. Goto www.strategyboard.net and register there,");
 		send.chatClient(clientId, "2. Login there and click 'In game login',");
@@ -176,7 +176,7 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 	}
 		
 	private void showClientAlreadyLogged(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "You are already logged.");
 	}
 	

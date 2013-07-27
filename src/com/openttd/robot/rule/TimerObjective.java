@@ -19,9 +19,8 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
-import com.openttd.constant.OTTD;
 import com.openttd.gamescript.GSNewsPaper;
-import com.openttd.network.admin.NetworkClient.Send;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.ExternalServices.ExternalGameService;
 import com.openttd.robot.model.ExternalUser;
@@ -156,7 +155,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 				//Rule #3
 				ExternalUser user = externalUsers.getExternalUser(clientId);
 				if(user != null && user.isAdmin()) {
-					Send send = super.getSend();
+					NetworkAdminSender send = super.getSend();
 					send.chatClient(clientId, "Game ending now !");
 					endGame = chatEvent.getOpenttd().getDate();
 				}
@@ -165,7 +164,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 	}
 	
 	private void showGoal(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Goal ***");
 		if(endGame != null) {
 			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
@@ -177,7 +176,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 	}
 	
 	private void broadcastVictory(Game openttd) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatBroadcast("Game Over ***");
 		if(finalScores != null) {
 			boolean winner = true;
@@ -212,7 +211,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 	}
 	
 	private void showScore(long clientId, Game openttd) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Score ***");
 		Collection<ScoreBean> scoreBeans = calculateScores(openttd);
 		for(ScoreBean scoreBean : scoreBeans) {

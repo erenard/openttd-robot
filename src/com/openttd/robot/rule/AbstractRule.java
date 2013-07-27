@@ -1,9 +1,10 @@
 package com.openttd.robot.rule;
 
+import java.util.Collection;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.EventListener;
-import com.openttd.network.admin.NetworkClient;
-import java.util.Collection;
+import com.openttd.network.admin.NetworkAdminSender;
 
 public abstract class AbstractRule implements EventListener {
 	private final OpenttdAdmin openttdAdmin;
@@ -15,7 +16,7 @@ public abstract class AbstractRule implements EventListener {
 		this.register();
 	}
 	
-	protected NetworkClient.Send getSend() {
+	protected NetworkAdminSender getSend() {
 		return openttdAdmin.getSend();
 	}
 	

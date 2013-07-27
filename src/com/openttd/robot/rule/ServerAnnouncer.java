@@ -1,13 +1,14 @@
 package com.openttd.robot.rule;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.event.ClientEvent;
 import com.openttd.admin.event.ClientEventListener;
-import com.openttd.network.admin.NetworkClient.Send;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.openttd.network.admin.NetworkAdminSender;
 
 /**
  * Show announce on client join and every 6 months.
@@ -60,13 +61,13 @@ public class ServerAnnouncer extends AbstractRule implements ClientEventListener
 	}
 
 	private void showWelcome(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Welcome to www.strategyboard.net goal server.");
 		send.chatClient(clientId, "Type: !howto or !help.");
 	}
 
 	private void showRules(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Any violation of these rules will make you banned.");
 		send.chatClient(clientId, "# 0: Retaliation doesn't allow you to break any of these rules.");
 		send.chatClient(clientId, "# 1: Stay friendly and respect each other! Any racism/rude language will be sanctioned.");
@@ -83,7 +84,7 @@ public class ServerAnnouncer extends AbstractRule implements ClientEventListener
 	}
 
 	private void showHelp(int clientId) {
-		Send send = super.getSend();
+		NetworkAdminSender send = super.getSend();
 		send.chatClient(clientId, "Valid commands are !goal, !rules, !login, !howto, !score, !rename and !resetme.");
 		send.chatClient(clientId, "Short commands are !g, !r, !cv or !cp (equ. to !score)");
 	}
