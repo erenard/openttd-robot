@@ -4,12 +4,14 @@
  */
 package com.openttd.robot;
 
+import com.openttd.demo.CLIUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
+import com.openttd.demo.TestUtil;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
 import com.openttd.robot.rule.Administration;
@@ -18,8 +20,14 @@ import com.openttd.robot.rule.CompanyPasswordRemainder;
 import com.openttd.robot.rule.ExternalUsers;
 import com.openttd.robot.rule.ServerAnnouncer;
 import com.openttd.robot.rule.TimerObjective;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 public class StrategyboardTest {
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(StrategyboardTest.class);
+
 	private final OpenttdAdmin robot;
 	private final ExternalUsers externalUsers;
 	private final CompanyLifeCycle companyLifeCycle;
@@ -29,7 +37,10 @@ public class StrategyboardTest {
 	private final Administration administration;
 	private final PleaseKillMe pleaseKillMe;
 
-	public StrategyboardTest(Configuration configuration) {
+	public StrategyboardTest() {
+		Configuration configuration = new Configuration();
+		configuration.password = "plop";
+		TestUtil.fakeExternalUserService();
 		robot = new OpenttdAdmin(configuration);
 		externalUsers = new ExternalUsers(robot);
 		companyLifeCycle = new CompanyLifeCycle(robot, externalUsers);
@@ -39,7 +50,6 @@ public class StrategyboardTest {
 		timerObjective = new TimerObjective(robot, externalUsers, 10);
 		administration = new Administration(robot, externalUsers);
 		pleaseKillMe = new PleaseKillMe(robot);
-		robot.startup();
 	}
 
 	private class PleaseKillMe extends AbstractRule implements ChatEventListener {
@@ -62,10 +72,20 @@ public class StrategyboardTest {
 		}
 	}
 	
-	public static void main(String [] args) {
-		CLITestUtil.fakeExternalUserService();
-		Configuration configuration = new Configuration();
-		CLITestUtil.parseArguments(args, configuration);
-		StrategyboardTest test = new StrategyboardTest(configuration);
+	@Test
+	public void testStrategyboard() {
+		CLIUtil.wait(60);
+	}
+	
+	@Before
+	public void setUp() {
+		robot.startup();
+		CLIUtil.wait(1);
+	}
+	
+	@After
+	public void tearDown() {
+		robot.shutdown();
+		CLIUtil.wait(1);
 	}
 }

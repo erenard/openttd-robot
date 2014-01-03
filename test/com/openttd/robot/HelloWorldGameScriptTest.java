@@ -1,5 +1,6 @@
 package com.openttd.robot;
 
+import com.openttd.demo.CLIUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -10,6 +11,9 @@ import com.openttd.admin.event.DateEventListener;
 import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class HelloWorldGameScriptTest {
 	//Openttd admin port library
@@ -17,34 +21,29 @@ public class HelloWorldGameScriptTest {
 	//Hello world dummy rule
 	private final HelloWorld helloworld;
 
-	public HelloWorldGameScriptTest(Configuration configuration) {
+	public HelloWorldGameScriptTest() {
+		Configuration configuration = new Configuration();
+		configuration.password = "plop";
 		openttdAdmin = new OpenttdAdmin(configuration);
 		helloworld = new HelloWorld(openttdAdmin);
 	}
 	
+	@Before
 	public void startup() {
 		openttdAdmin.startup();
+		CLIUtil.wait(1);
 	}
 
+	@After
 	public void shutdown() {
 		openttdAdmin.shutdown();
+		CLIUtil.wait(1);
 	}
 
-	public static void main(String[] args) {
-		Configuration configuration = new Configuration();
-		CLITestUtil.parseArguments(args, configuration);
-		//Create the robot
-		HelloWorldGameScriptTest robot = new HelloWorldGameScriptTest(configuration);
-		//Start the robot and connect it to OpenTTD
-		robot.startup();
+	@Test
+	public void main() {
 		//Wait 1 minute
-		try {
-			Thread.sleep(60000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		//Disconnect the robot and shut it down
-		robot.shutdown();
+		CLIUtil.wait(10);
 	}
 	
 	/**
@@ -53,7 +52,7 @@ public class HelloWorldGameScriptTest {
 	 * - extending AbstractRule
 	 * - implementing DateEventListener
 	 */
-	public static class HelloWorld extends AbstractRule implements DateEventListener {
+	public class HelloWorld extends AbstractRule implements DateEventListener {
 
 		public HelloWorld(OpenttdAdmin openttdAdmin) {
 			//AbstractRule constructor call
@@ -80,8 +79,8 @@ public class HelloWorldGameScriptTest {
 		public void onDateEvent(DateEvent dateEvent) {
 			Calendar date = dateEvent.getOpenttd().getDate();
 			if(date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-				GSNewsPaper newsPaper = new GSNewsPaper(GSNewsPaper.NewsType.NT_GENERAL, "Admin\nHello world !!!");
-				super.getSend().gameScript(newsPaper.toString());
+				GSNewsPaper newsPaper = new GSNewsPaper(GSNewsPaper.NewsType.NT_GENERAL, "Admin\r\nHello world !!!");
+				openttdAdmin.getGSExecutor().send(newsPaper);
 			}
 		}
 	}

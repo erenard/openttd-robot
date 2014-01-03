@@ -1,4 +1,4 @@
-package com.openttd.robot;
+package com.openttd.demo;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,11 +8,12 @@ import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.network.core.Configuration;
+import com.openttd.demo.HelloWorldDemo;
 import com.openttd.robot.rule.AbstractRule;
 import com.openttd.robot.rule.Administration;
 import com.openttd.robot.rule.ExternalUsers;
 
-public class AdministrationTest extends OpenttdAdmin {
+public class AdministrationDemo extends OpenttdAdmin {
 	
 	/**
 	 * Ingame help rule.
@@ -51,7 +52,7 @@ public class AdministrationTest extends OpenttdAdmin {
 	//Ingame info rule
 	private final IngameInfo ingameInfo;
 
-	public AdministrationTest(Configuration configuration) {
+	public AdministrationDemo(Configuration configuration) {
 		super(configuration);
 		externalUsers = new ExternalUsers(this);
 		administration = new Administration(this, externalUsers);
@@ -60,10 +61,10 @@ public class AdministrationTest extends OpenttdAdmin {
 
 	public static void main(String[] args) {
 		Configuration configuration = new Configuration();
-		CLITestUtil.parseArguments(args, configuration);
-		CLITestUtil.fakeExternalUserService();
+		CLIUtil.parseArguments(args, configuration);
+		TestUtil.fakeExternalUserService();
 		//Create the robot
-		HelloWorldTest robot = new HelloWorldTest(configuration);
+		HelloWorldDemo robot = new HelloWorldDemo(configuration);
 		//Start the robot and connect it to OpenTTD
 		robot.startup();
 		//Wait 3 minutes

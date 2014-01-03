@@ -1,4 +1,4 @@
-package com.openttd.robot;
+package com.openttd.demo;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,13 +10,13 @@ import com.openttd.admin.event.DateEventListener;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
 
-public class HelloWorldTest {
+public class HelloWorldDemo {
 	//Openttd admin port library
 	private final OpenttdAdmin openttdAdmin;
 	//Hello world dummy rule
 	private final HelloWorld helloworld;
 
-	public HelloWorldTest(Configuration configuration) {
+	public HelloWorldDemo(Configuration configuration) {
 		openttdAdmin = new OpenttdAdmin(configuration);
 		helloworld = new HelloWorld(openttdAdmin);
 	}
@@ -31,9 +31,9 @@ public class HelloWorldTest {
 
 	public static void main(String[] args) {
 		Configuration configuration = new Configuration();
-		CLITestUtil.parseArguments(args, configuration);
+		CLIUtil.parseArguments(args, configuration);
 		//Create the robot
-		HelloWorldTest robot = new HelloWorldTest(configuration);
+		HelloWorldDemo robot = new HelloWorldDemo(configuration);
 		//Start the robot and connect it to OpenTTD
 		robot.startup();
 		//Wait 1 minute

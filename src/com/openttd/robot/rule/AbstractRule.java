@@ -22,13 +22,13 @@ public abstract class AbstractRule implements EventListener {
 	
 	abstract protected Collection<Class> listEventTypes();
 
-	public void register() {
+	public final void register() {
 		for(Class eventClass : eventClasses) {
 			this.openttdAdmin.addListener(eventClass, this);
 		}
 	}
 	
-	public void unregister() {
+	public final void unregister() {
 		for(Class eventClass : eventClasses) {
 			this.openttdAdmin.removeListener(eventClass, this);
 		}

@@ -1,9 +1,10 @@
 /.classpath
 /.project
+/build.xml
+/manifest.mf
 /openttd-robot.jar
 /bin
 /nb-build.xml
 /nbproject/
-
 /build/
 /dist/
