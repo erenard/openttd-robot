@@ -178,6 +178,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 	private void broadcastVictory(Game openttd) {
 		NetworkAdminSender send = super.getSend();
 		send.chatBroadcast("Game Over ***");
+		send.rcon("setting min_active_clients 0");
 		if(finalScores != null) {
 			boolean winner = true;
 			for(ScoreBean scoreBean : finalScores) {
