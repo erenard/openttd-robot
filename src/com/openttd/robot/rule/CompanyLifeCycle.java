@@ -6,15 +6,12 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
-import com.openttd.admin.event.ClientEvent;
-import com.openttd.admin.event.ClientEventListener;
 import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEvent.Action;
 import com.openttd.admin.event.CompanyEventListener;
@@ -24,6 +21,8 @@ import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.util.Convert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Company life-cycle rule :
@@ -34,7 +33,9 @@ import com.openttd.util.Convert;
  * Rule #5: handle !info
  * Rule #6: handle $reset
  */
-public class CompanyLifeCycle extends AbstractRule implements CompanyEventListener, ChatEventListener, ClientEventListener {
+public class CompanyLifeCycle extends AbstractRule implements CompanyEventListener, ChatEventListener {
+	
+	private static Logger log = LoggerFactory.getLogger(CompanyLifeCycle.class);
 	
 	private final ExternalUsers externalUsers;
 
@@ -44,69 +45,55 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 	}
 
 	//Company id stored by the ip address of the creator  
-	private Map<String, Long> createDateByIpAddress = new HashMap<String, Long>();
-	private Collection<Integer> clientsOnProbation = new HashSet<Integer>();
-	private Collection<Integer> certifiedCompanies = new HashSet<Integer>();
+	private final Map<String, Long> createDateByIpAddress = new HashMap<String, Long>();
 
 	//Configuration
-	public static int CREATE_COMPANY_DAY_TIMEOUT = 90;
+	public int CREATE_COMPANY_DAY_TIMEOUT = 90;
 	public boolean checkLogin = true;
 	public boolean checkIpAddress = true;
 	
 	@Override
-	public void onClientEvent(ClientEvent clientEvent) {
-		switch (clientEvent.getAction()) {
-		case CREATE: {
-			int clientId = clientEvent.getClientId();
-			Client client = clientEvent.getOpenttd().getClient(clientId);
-			int companyId = client.getCompanyId();
-			if(companyId != 255 && !certifiedCompanies.contains(companyId)) {
-				clientsOnProbation.add(clientId);
-			}
-			break;
-		}
-		case UPDATE: {
-			int clientId = clientEvent.getClientId();
-			if(clientsOnProbation.contains(clientId)) {
-				clientsOnProbation.remove(clientId);
-				Game game = clientEvent.getOpenttd();
-				Client client = game.getClient(clientId);
-				int companyId = client.getCompanyId();
-				testCompany(companyId, game);
-			}
-			break;
-		}
-		case DELETE: {
-			clientsOnProbation.remove(clientEvent.getClientId());
-			break;
-		}
-		}		
-	}
-
-	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(3);
 		listEventTypes.add(CompanyEvent.class);
-		listEventTypes.add(ClientEvent.class);
 		listEventTypes.add(ChatEvent.class);
 		return listEventTypes;
 	}
 
+	@Override
+	public void onCompanyEvent(CompanyEvent companyEvent) {
+		if(log.isDebugEnabled()) {
+			log.debug("CompanyLifeCycle.onCompanyEvent " + companyEvent.toString());
+		}
+		int companyId = companyEvent.getCompanyId();
+		Action action = companyEvent.getAction();
+		Game game = companyEvent.getOpenttd();
+		switch(action) {
+		case CREATE: {
+			testCompany(companyId, game);
+			break;
+		}
+		case UPDATE: {
+			break;
+		}
+		case DELETE: {
+			//Keep the local model up to date
+			externalUsers.removeOwnerOf(companyId);
+			break;
+		}
+		}
+		
+	}
+
 	private void testCompany(int companyId, Game game) {
-		/*
-		 * This case will always be called AFTER UPDATE,
-		 * It's due to openttd.
-		 */
 		NetworkAdminSender send = super.getSend();
-		//Case : Company creation
 		// Find the company owner
 		ExternalUser companyOwner = null;
-		Client creator = null;
 		String ipAddress = null;
 		{
 			Collection<Client> clients = game.getClients(companyId);
 			if(clients != null) {
-				creator = clients.iterator().next();
+				Client creator = clients.iterator().next();
 				if(creator != null) {
 					ipAddress = creator.getIp();
 					//Client is logged
@@ -134,7 +121,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 					DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
 					StringBuffer sb = new StringBuffer();
 					Formatter formatter = new Formatter(sb);
-					formatter.format("Company %d creation rejected: Only one company every 90 days is allowed (%s).", companyId, dateFormat.format(dateOfAllowedCreation.getTime()));
+					formatter.format("Company %d creation rejected: Only one company every %d days is allowed (%s).", companyId, CREATE_COMPANY_DAY_TIMEOUT, dateFormat.format(dateOfAllowedCreation.getTime()));
 					send.chatCompany((short) companyId, sb.toString());
 					deleteCompany(game, companyId);
 					return;
@@ -143,7 +130,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		}
 		// Add the company to the allowed companies
 		if(ipAddress != null) {
-			certifiedCompanies.add(companyId);
+			//certifiedCompanies.add(companyId);
 			createDateByIpAddress.put(ipAddress, Convert.calendarToDay(game.getDate()));
 		}
 		if(companyOwner != null) {
@@ -160,30 +147,6 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		}
 	}
 	
-	@Override
-	public void onCompanyEvent(CompanyEvent companyEvent) {
-		int companyId = companyEvent.getCompanyId();
-		Action action = companyEvent.getAction();
-		Game game = companyEvent.getOpenttd();
-		switch(action) {
-		case CREATE: {
-			testCompany(companyId, game);
-			break;
-		}
-		case UPDATE: {
-			break;
-		}
-		case DELETE: {
-			//Case : Company deletion
-			certifiedCompanies.remove(companyId);
-			//Keep the local model up to date
-			externalUsers.removeOwnerOf(companyId);
-			break;
-		}
-		}
-		
-	}
-
 	private void deleteCompany(Game game, int companyId) {
 		NetworkAdminSender send = super.getSend();
 		Collection<Client> clients = game.getClients(companyId);
@@ -195,6 +158,9 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 
 	@Override
 	public void onChatEvent(ChatEvent chatEvent) {
+		if(log.isDebugEnabled()) {
+			log.debug("CompanyLifeCycle.onChatEvent " + chatEvent.toString());
+		}
 		int clientId = chatEvent.getClientId();
 		String message = chatEvent.getMessage();
 		Game openttd = chatEvent.getOpenttd();
