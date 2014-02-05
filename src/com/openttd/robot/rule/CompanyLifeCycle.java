@@ -2,12 +2,15 @@ package com.openttd.robot.rule;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
@@ -20,9 +23,6 @@ import com.openttd.admin.model.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.model.ExternalUser;
-import com.openttd.util.Convert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Company life-cycle rule :
@@ -44,14 +44,14 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		this.externalUsers = externalUsers;
 	}
 
-	//Company id stored by the ip address of the creator  
-	private final Map<String, Long> createDateByIpAddress = new HashMap<String, Long>();
+	//Company id stored by the ip address of the creator
+	private final Map<String, Integer> companyIdByIpAddress = new HashMap<String, Integer>();
 
 	//Configuration
-	public int CREATE_COMPANY_DAY_TIMEOUT = 90;
 	public boolean checkLogin = true;
 	public boolean checkIpAddress = true;
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(3);
@@ -70,7 +70,35 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		Game game = companyEvent.getOpenttd();
 		switch(action) {
 		case CREATE: {
-			testCompany(companyId, game);
+			if (applyRules(companyId, game)) {
+				// Find the company owner
+				ExternalUser companyOwner = null;
+				{
+					Collection<Client> clients = game.getClients(companyId);
+					if(clients != null) {
+						Client creator = clients.iterator().next();
+						if(creator != null) {
+							//Client is logged
+							companyOwner = externalUsers.getExternalUser(creator.getId());
+						}
+					}
+				}
+				
+				if(companyOwner != null) {
+					//First remove ownership of every other company
+					Collection<Company> companies = game.getCompanies();
+					for(Company company : companies) {
+						ExternalUser externalUser = externalUsers.getOwnerOf(company.getId());
+						if(companyOwner.equals(externalUser)) {
+							externalUsers.removeOwnerOf(company.getId());
+						}
+					}
+					//Then own a company
+					externalUsers.setOwnerOf(companyId, companyOwner);
+				}
+			} else {
+				deleteCompany(game, companyId);
+			}
 			break;
 		}
 		case UPDATE: {
@@ -79,21 +107,27 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		case DELETE: {
 			//Keep the local model up to date
 			externalUsers.removeOwnerOf(companyId);
+			for(Iterator<Map.Entry<String, Integer>> iterator = companyIdByIpAddress.entrySet().iterator(); iterator.hasNext(); ) {
+				Map.Entry<String, Integer> entry = iterator.next();
+				if(entry.getValue().equals(companyId)) {
+					iterator.remove();
+				}
+			}
 			break;
 		}
 		}
-		
 	}
 
-	private void testCompany(int companyId, Game game) {
+	private boolean applyRules(int companyId, Game game) {
 		NetworkAdminSender send = super.getSend();
 		// Find the company owner
 		ExternalUser companyOwner = null;
+		Client creator = null;
 		String ipAddress = null;
 		{
 			Collection<Client> clients = game.getClients(companyId);
 			if(clients != null) {
-				Client creator = clients.iterator().next();
+				creator = clients.iterator().next();
 				if(creator != null) {
 					ipAddress = creator.getIp();
 					//Client is logged
@@ -103,48 +137,36 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 		}
 		// Verify Rule #1
 		if(checkLogin && companyOwner == null) {
-			send.chatCompany((short) companyId, "Company " + companyId + " creation rejected: Client non logged.");
-			deleteCompany(game, companyId);
-			Collection<Client> clients = game.getClients(companyId);
-			for(Client client : clients) {
-				externalUsers.showHowtoLogin(client.getId());
+			if (creator != null) {
+				send.chatClient(creator.getId(), "Company " + companyId + " creation rejected: Please loggin before start a new company.");
+				externalUsers.showHowtoLogin(creator.getId());
 			}
-			return;
+			return false;
 		}
 		// Verify Rule #2
-		if(checkIpAddress && (companyOwner == null || !companyOwner.isAdmin())) {
-			Long dayOfLastCreation = createDateByIpAddress.get(ipAddress);
-			if(dayOfLastCreation != null) {
-				Calendar dateOfAllowedCreation = Convert.dayToCalendar(dayOfLastCreation);
-				dateOfAllowedCreation.add(Calendar.DAY_OF_YEAR, CREATE_COMPANY_DAY_TIMEOUT);
-				if(dateOfAllowedCreation.after(game.getDate())) {
-					DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK);
-					StringBuffer sb = new StringBuffer();
-					Formatter formatter = new Formatter(sb);
-					formatter.format("Company %d creation rejected: Only one company every %d days is allowed (%s).", companyId, CREATE_COMPANY_DAY_TIMEOUT, dateFormat.format(dateOfAllowedCreation.getTime()));
-					send.chatCompany((short) companyId, sb.toString());
-					deleteCompany(game, companyId);
-					return;
+		if (checkIpAddress && ipAddress != null) {
+			if(companyOwner == null || !companyOwner.isAdmin()) {
+				Integer previousCompanyId = companyIdByIpAddress.get(ipAddress);
+				if (previousCompanyId != null) {
+					Company previousCompany = game.getCompany(previousCompanyId);
+					if (previousCompany != null) {
+						String companyName = game.getCompany(companyId).getName();
+						String previousCompanyName = game.getCompany(previousCompanyId).getName();
+						StringBuffer sb = new StringBuffer();
+						Formatter formatter = new Formatter(sb);
+						formatter.format("Company '%s' creation rejected: You (%s) already own '%s'.", companyName, ipAddress, previousCompanyName);
+						if (creator != null) {
+							send.chatClient(creator.getId(), sb.toString());
+						}
+						formatter.close();
+						return false;
+					}
 				}
 			}
+			// Add the company
+			companyIdByIpAddress.put(ipAddress, companyId);
 		}
-		// Add the company to the allowed companies
-		if(ipAddress != null) {
-			//certifiedCompanies.add(companyId);
-			createDateByIpAddress.put(ipAddress, Convert.calendarToDay(game.getDate()));
-		}
-		if(companyOwner != null) {
-			//First remove ownership of every other company
-			Collection<Company> companies = game.getCompanies();
-			for(Company company : companies) {
-				ExternalUser externalUser = externalUsers.getOwnerOf(company.getId());
-				if(companyOwner.equals(externalUser)) {
-					externalUsers.removeOwnerOf(company.getId());
-				}
-			}
-			//Then own a company
-			externalUsers.setOwnerOf(companyId, companyOwner);
-		}
+		return true;
 	}
 	
 	private void deleteCompany(Game game, int companyId) {
@@ -214,6 +236,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 						externalUsers.getOwnerOf(company.getId()).getName(),
 						dateFormat.format(company.getInauguration().getTime()));
 				send.chatClient(clientId, sb.toString());
+				formatter.close();
 			}
 		}
 	}

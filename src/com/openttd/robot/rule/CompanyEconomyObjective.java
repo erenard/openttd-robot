@@ -84,6 +84,7 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(3);
@@ -161,6 +162,8 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 			progressByCompanyId.remove(companyId);
 			progressHistoryByCompanyId.remove(companyId);
 		}
+		default:
+			break;
 		}
 	}
 

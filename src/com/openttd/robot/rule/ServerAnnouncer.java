@@ -18,11 +18,8 @@ import com.openttd.network.admin.NetworkAdminSender;
  */
 public class ServerAnnouncer extends AbstractRule implements ClientEventListener, ChatEventListener {
 
-	private final ExternalUsers externalUsers;
-
-	public ServerAnnouncer(OpenttdAdmin openttdAdmin, ExternalUsers externalUsers) {
+	public ServerAnnouncer(OpenttdAdmin openttdAdmin) {
 		super(openttdAdmin);
-		this.externalUsers = externalUsers;
 	}
 
 	@Override
@@ -33,6 +30,8 @@ public class ServerAnnouncer extends AbstractRule implements ClientEventListener
 			showWelcome(clientId);
 			break;
 		}
+		default:
+			break;
 		}
 	}
 
@@ -52,6 +51,7 @@ public class ServerAnnouncer extends AbstractRule implements ClientEventListener
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(2);

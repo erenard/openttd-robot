@@ -63,6 +63,7 @@ public class HelloWorldDemo {
 		 * Registrer here, all the event types this rule is listenning.
 		 * @return the event type this rule is interested in.
 		 */
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Collection<Class> listEventTypes() {
 			Collection<Class> listEventTypes = new ArrayList<Class>();

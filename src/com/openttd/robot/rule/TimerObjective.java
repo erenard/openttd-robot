@@ -75,6 +75,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(2);
@@ -201,6 +202,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 						company.getName(), scoreBean.score);
 				}
 				send.chatBroadcast(stringBuilder.toString());
+				formatter.close();
 			}
 		}
 		if(restartServer != null) {
@@ -224,6 +226,7 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 				scoreBean.companyName,
 				scoreBean.externalUser != null ? scoreBean.externalUser.getName() : "Nobody");
 			send.chatClient(clientId, stringBuilder.toString());
+			formatter.close();
 		}
 	}
 

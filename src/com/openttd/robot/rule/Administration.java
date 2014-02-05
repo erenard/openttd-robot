@@ -86,6 +86,7 @@ public class Administration extends AbstractRule implements ChatEventListener {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(1);

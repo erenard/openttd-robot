@@ -26,6 +26,7 @@ public class AdministrationDemo extends OpenttdAdmin {
 			super(openttdAdmin);
 		}
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		protected Collection<Class> listEventTypes() {
 			Collection<Class> classes = new ArrayList<Class>();
@@ -45,18 +46,15 @@ public class AdministrationDemo extends OpenttdAdmin {
 		}
 	}
 
-	//External user login rule
-	private final ExternalUsers externalUsers;
-	//Administration commands rule
-	private final Administration administration;
-	//Ingame info rule
-	private final IngameInfo ingameInfo;
 
 	public AdministrationDemo(Configuration configuration) {
 		super(configuration);
-		externalUsers = new ExternalUsers(this);
-		administration = new Administration(this, externalUsers);
-		ingameInfo = new IngameInfo(this);
+		//External user login rule
+		ExternalUsers externalUsers = new ExternalUsers(this);
+		//Administration commands rule
+		new Administration(this, externalUsers);
+		//Ingame info rule
+		new IngameInfo(this);
 	}
 
 	public static void main(String[] args) {

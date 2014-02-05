@@ -6,6 +6,7 @@ import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.EventListener;
 import com.openttd.network.admin.NetworkAdminSender;
 
+@SuppressWarnings("rawtypes")
 public abstract class AbstractRule implements EventListener {
 	private final OpenttdAdmin openttdAdmin;
 	private final Collection<Class> eventClasses;

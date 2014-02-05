@@ -67,7 +67,7 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 					Game openttd = chatEvent.getOpenttd();
 					int companyId = openttd.getClient(clientId).getCompanyId();
 					if(logged && companyId != 255) {
-						ExternalUser companyOwner = externalUserByCompanyId.get(companyId);
+						ExternalUser companyOwner = getOwnerOf(companyId);
 						Company company = openttd.getCompany(companyId);
 						String companyName = company.getName();
 						if(companyOwner != null) {
@@ -81,10 +81,10 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 							for(Entry<Integer, ExternalUser> entry : copy) {
 								log.info(entry.getKey() + " " + entry.getValue());
 								if(user.equals(entry.getValue())) {
-									externalUserByCompanyId.remove(entry.getKey());
+									removeOwnerOf(entry.getKey());
 								}
 							}
-							externalUserByCompanyId.put(companyId, user);
+							setOwnerOf(companyId, user);
 							showCompanyOwned(clientId, companyName, user);
 						}
 					}
@@ -103,6 +103,7 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(1);

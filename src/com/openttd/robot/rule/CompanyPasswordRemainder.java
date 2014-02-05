@@ -45,6 +45,7 @@ public class CompanyPasswordRemainder extends AbstractRule implements DateEventL
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
 		Collection<Class> listEventTypes = new ArrayList<Class>(3);
