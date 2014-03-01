@@ -46,7 +46,7 @@ public class StrategyboardTest {
 		companyLifeCycle = new CompanyLifeCycle(robot, externalUsers);
 		companyLifeCycle.checkLogin = false;
 		companyPasswordRemainder = new CompanyPasswordRemainder(robot);
-		serverAnnouncer = new ServerAnnouncer(robot, externalUsers);
+		serverAnnouncer = new ServerAnnouncer(robot);
 		timerObjective = new TimerObjective(robot, externalUsers, 10);
 		administration = new Administration(robot, externalUsers);
 		pleaseKillMe = new PleaseKillMe(robot);
