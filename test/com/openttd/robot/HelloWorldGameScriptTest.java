@@ -11,6 +11,7 @@ import com.openttd.admin.event.DateEventListener;
 import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.core.Configuration;
 import com.openttd.robot.rule.AbstractRule;
+import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +22,9 @@ public class HelloWorldGameScriptTest {
 	//Hello world dummy rule
 	private final HelloWorld helloworld;
 
-	public HelloWorldGameScriptTest() {
+	public HelloWorldGameScriptTest() throws IOException {
 		Configuration configuration = new Configuration();
-		configuration.password = "plop";
+		configuration.password = CLIUtil.readTestProperties().getProperty("password");
 		openttdAdmin = new OpenttdAdmin(configuration);
 		helloworld = new HelloWorld(openttdAdmin);
 	}

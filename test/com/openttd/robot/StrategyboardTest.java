@@ -20,6 +20,7 @@ import com.openttd.robot.rule.CompanyPasswordRemainder;
 import com.openttd.robot.rule.ExternalUsers;
 import com.openttd.robot.rule.ServerAnnouncer;
 import com.openttd.robot.rule.TimerObjective;
+import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,9 +38,9 @@ public class StrategyboardTest {
 	private final Administration administration;
 	private final PleaseKillMe pleaseKillMe;
 
-	public StrategyboardTest() {
+	public StrategyboardTest() throws IOException {
 		Configuration configuration = new Configuration();
-		configuration.password = "plop";
+		configuration.password = CLIUtil.readTestProperties().getProperty("password");
 		TestUtil.fakeExternalUserService();
 		robot = new OpenttdAdmin(configuration);
 		externalUsers = new ExternalUsers(robot);
