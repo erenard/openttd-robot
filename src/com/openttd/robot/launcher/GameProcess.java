@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 public class GameProcess extends Thread {
 
-	private static Logger log = LoggerFactory.getLogger(GameProcess.class);
+	private static final Logger log = LoggerFactory.getLogger(GameProcess.class);
 	
-	private ProcessBuilder processBuilder;
+	private final ProcessBuilder processBuilder;
 	private Process process;
 	private boolean running = false;
 	
@@ -57,6 +57,7 @@ public class GameProcess extends Thread {
 		this.start();
 	}
 
+	@Override
 	public void destroy() {
 		running = false;
 		if(process != null) {
