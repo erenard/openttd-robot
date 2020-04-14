@@ -57,7 +57,6 @@ public class GameProcess extends Thread {
 		this.start();
 	}
 
-	@Override
 	public void destroy() {
 		running = false;
 		if(process != null) {

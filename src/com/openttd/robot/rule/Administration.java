@@ -46,7 +46,7 @@ public class Administration extends AbstractRule implements ChatEventListener {
 					//Rule #2
 					try {
 						String argument = message.split(" ")[1].trim();
-						Integer kickedClientId = new Integer(argument);
+						Integer kickedClientId = Integer.parseInt(argument);
 						kick(kickedClientId);
 					} catch(Exception e) {
 						showMessage(clientId, "Usage: $kick clientId (try $clients to find clientIds)");
@@ -55,7 +55,7 @@ public class Administration extends AbstractRule implements ChatEventListener {
 					//Rule #3
 					try {
 						String argument = message.split(" ")[1].trim();
-						Integer bannedClientId = new Integer(argument);
+						Integer bannedClientId = Integer.parseInt(argument);
 						ban(bannedClientId);
 					} catch(Exception ignore) {
 						showMessage(clientId, "Usage: $ban clientId (try $clients to find clientIds)");

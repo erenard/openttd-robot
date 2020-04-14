@@ -8,7 +8,6 @@ import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.network.core.Configuration;
-import com.openttd.demo.HelloWorldDemo;
 import com.openttd.robot.rule.AbstractRule;
 import com.openttd.robot.rule.Administration;
 import com.openttd.robot.rule.ExternalUsers;

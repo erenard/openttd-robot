@@ -207,7 +207,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 					//Rule #6
 					try {
 						String argument = message.split(" ")[1].trim();
-						Integer companyId = new Integer(argument);
+						Integer companyId = Integer.parseInt(argument);
 						deleteCompany(openttd, companyId);
 					} catch(Exception ignore) {
 						showMessage(clientId, "Usage: $reset companyId (try $companies to find companyIds)");
