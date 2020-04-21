@@ -13,7 +13,7 @@ public class GameProcessOptions {
 		options = new ArrayList<String>();
 		options.add(openttdCommand);
 		options.add("-D");
-		options.add("-d0");
+		options.add("-d 1");
 	}
 	
 	public void addOption(String option) {
