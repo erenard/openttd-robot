@@ -5,6 +5,7 @@
  */
 package com.openttd.demo;
 
+import com.openttd.network.admin.GameInfo;
 import com.openttd.robot.ExternalServices;
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.robot.model.GamePlayer;
@@ -31,6 +32,11 @@ public class TestUtil {
 		});
 		//Fake game service
 		ExternalServices.getInstance().setExternalGameService(new ExternalServices.ExternalGameService() {
+			@Override
+			public void exposeGame(GameInfo gameInfo) {
+                System.out.println(gameInfo);
+			}
+
 			@Override
 			public void saveGame(Collection<GamePlayer> gamePlayers) {
 				for (GamePlayer gamePlayer : gamePlayers) {

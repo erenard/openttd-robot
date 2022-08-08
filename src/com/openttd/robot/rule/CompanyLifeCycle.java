@@ -18,8 +18,8 @@ import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEvent.Action;
 import com.openttd.admin.event.CompanyEventListener;
-import com.openttd.admin.model.Client;
-import com.openttd.admin.model.Company;
+import com.openttd.network.admin.Client;
+import com.openttd.network.admin.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.model.ExternalUser;
@@ -54,7 +54,7 @@ public class CompanyLifeCycle extends AbstractRule implements CompanyEventListen
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(CompanyEvent.class);
 		listEventTypes.add(ChatEvent.class);
 		return listEventTypes;

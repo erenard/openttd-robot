@@ -51,10 +51,9 @@ public class ServerAnnouncer extends AbstractRule implements ClientEventListener
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(2);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(ChatEvent.class);
 		listEventTypes.add(ClientEvent.class);
 		return listEventTypes;

@@ -7,7 +7,7 @@ import java.util.Collection;
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
-import com.openttd.admin.model.Company;
+import com.openttd.network.admin.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 
@@ -48,7 +48,7 @@ public class CompanyPasswordRemainder extends AbstractRule implements DateEventL
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(DateEvent.class);
 		return listEventTypes;
 	}

@@ -19,8 +19,8 @@ import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
-import com.openttd.admin.model.Client;
-import com.openttd.admin.model.Company;
+import com.openttd.network.admin.Client;
+import com.openttd.network.admin.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.ExternalServices;
@@ -87,7 +87,7 @@ public class CompanyEconomyObjective extends AbstractRule implements CompanyEven
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(3);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(CompanyEvent.class);
 		listEventTypes.add(DateEvent.class);
 		listEventTypes.add(ChatEvent.class);

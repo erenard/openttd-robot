@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
-import com.openttd.admin.model.Company;
+import com.openttd.network.admin.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.robot.ExternalServices;
@@ -103,10 +103,9 @@ public class ExternalUsers extends AbstractRule implements ChatEventListener {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(1);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(ChatEvent.class);
 		return listEventTypes;
 	}

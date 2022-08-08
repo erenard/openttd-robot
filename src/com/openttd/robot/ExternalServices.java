@@ -1,5 +1,6 @@
 package com.openttd.robot;
 
+import com.openttd.network.admin.GameInfo;
 import java.util.Collection;
 
 import com.openttd.robot.model.ExternalUser;
@@ -13,8 +14,8 @@ public class ExternalServices {
 	}
 	
 	public interface ExternalGameService {
+        void exposeGame(GameInfo gameState);
 		void saveGame(Collection<GamePlayer> gamePlayers);
-
 		void endGame();
 	}
 	

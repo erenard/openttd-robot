@@ -17,7 +17,7 @@ import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ChatEventListener;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
-import com.openttd.admin.model.Company;
+import com.openttd.network.admin.Company;
 import com.openttd.admin.model.Game;
 import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.admin.NetworkAdminSender;
@@ -75,10 +75,9 @@ public class TimerObjective extends AbstractRule implements DateEventListener, C
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Class> listEventTypes() {
-		Collection<Class> listEventTypes = new ArrayList<Class>(2);
+		Collection<Class> listEventTypes = new ArrayList();
 		listEventTypes.add(ChatEvent.class);
 		listEventTypes.add(DateEvent.class);
 		return listEventTypes;
